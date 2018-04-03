@@ -43,14 +43,14 @@ int main(){
 
 	sort(sets.begin(), sets.end(), compareSets);
 	// Uncomment following to see sets
-	cout << "Sets" << endl;
-	for(int i = 0 ; i < sets.size() ; i++){
-		cout << sets[i].size() <<  " :: ";
-		for(int j = 0 ; j < sets[i].size() ; j++){
-			cout << sets[i][j] << " ";
-		}
-		cout << endl;
-	}
+	// cout << "Sets" << endl;
+	// for(int i = 0 ; i < sets.size() ; i++){
+	// 	cout << sets[i].size() <<  " :: ";
+	// 	for(int j = 0 ; j < sets[i].size() ; j++){
+	// 		cout << sets[i][j] << " ";
+	// 	}
+	// 	cout << endl;
+	// }
 
 
 	cout << "Enter adjacency matrix" << endl;
@@ -61,12 +61,7 @@ int main(){
 		}
 	}
 
-	// start = 0;
 	int start = 0;
-	// cout << "Enter start city :: ";
-	// cin >> start;
-	// start--;
-
 	map< pair < vector<int> , int>, pair <int, int> > calculatedCost;
 
 	for(int i = 0 ; i < sets.size() ; i++){
@@ -86,28 +81,28 @@ int main(){
 					std::vector<int> v;
 					v = sets[i];
 
-					cout << "City number :: " << _cities[j] << " Set::" << endl;
-					for(int x = 0 ; x < v.size() ; x++)
-						cout << v[x] << " ";
-					cout << endl;
-
-					v.erase(v.begin() + k);
-
+					// cout << "City number :: " << _cities[j] << " Set::" << endl;
 					// for(int x = 0 ; x < v.size() ; x++)
 					// 	cout << v[x] << " ";
-					// cout << endl << endl;
+					// cout << endl;
+
+					v.erase(v.begin() + k);
 
 					pair < vector<int>, int > temp;
 					temp = make_pair(v, sets[i][k]);
 
 					int current_cost = calculatedCost[temp].first + adj[sets[i][k]][_cities[j]];
-					cout << "Current_Cost:: " << current_cost << "Parent : " << sets[i][k] << endl;
 					if(min_cost > current_cost){
 						min_cost = current_cost;
 						parent = sets[i][k];
 					}
 				}
-				cout << "Final :: " << min_cost << " " << parent << endl << endl;
+				cout << "Cost [" << _cities[j] << ", { ";
+				for(int k = 0 ; k < sets[i].size() ; k++){
+					cout << sets[i][k] << " ";
+				}
+				cout << "}] = " << min_cost << ", Parent :: " << calculatedCost[make_pair(sets[i], _cities[j])].second << endl;
+
 				calculatedCost[make_pair(sets[i], _cities[j])] = make_pair(min_cost, parent);
 			}
 		}
@@ -117,7 +112,24 @@ int main(){
 	std::vector<int> v;
 	v = citiesNotInSet(v, n_cities);
 
-	cout << calculatedCost[make_pair(v, 0)].first << " " << calculatedCost[make_pair(v, 0)].second << endl;
+	int parent = calculatedCost[make_pair(v, 0)].second;
+	// cout << calculatedCost[make_pair(v, 0)].first << " " << parent << endl;
+
+	stack <int> s;
+	for(int i = 0 ; i < n_cities ; i++){
+		s.push(parent);
+		//cout << parent << " ";
+		if(find(v.begin(), v.end(), parent) != v.end())
+			v.erase(find(v.begin(), v.end(), parent));
+		parent = calculatedCost[make_pair(v, parent)].second;
+	}
+
+	while(!s.empty()){
+		cout << s.top() << " -> ";
+		s.pop();  
+	}
+	cout << 0 << endl;
+	return 0;
 }		
 
 
