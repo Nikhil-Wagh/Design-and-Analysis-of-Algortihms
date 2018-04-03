@@ -1,5 +1,7 @@
 #include "stdio.h"
 #include "stdlib.h"
+#define INT_MAX 2147483647
+
 int isValidPosition(int *x, int n){
 	for(int j = 0 ; j < n ; j++){
 		if((abs(x[j] - x[n]) == abs(j - n)) || (x[j] == x[n]))
@@ -7,7 +9,11 @@ int isValidPosition(int *x, int n){
 	}
 	return 1;
 }
+
+// int n_iter = 0;
+
 void printCheckBoard(int *x, int n){
+	// printf("No :: %d\n", n_iter);
 	for(int i = 0 ; i < n ; i++)
 		printf(" _");
 	printf("\n");
@@ -23,25 +29,30 @@ void printCheckBoard(int *x, int n){
 		printf("\n");
 	}
 	printf("\n");
+	return;
 }
-int recursive_nqueen(int *x, int i, int n, int *n_sol, int max_sol){
+
+void recursive_nqueen(int *x, int i, int n, int *n_sol, int max_sol){
+	// if(*n_sol < max_sol)
+	// 	return 0;
 	if(i >= n)
-		return 0;
-	for(int k = 0 ; k < n ; k++){
+		return;
+	int f = 0;
+	for(int k = 0 ; k < n && (!f); k++){
+		if(*n_sol >= max_sol)
+			return;
 		x[i] = k;
 		if(isValidPosition(x, i)){
 			if(i == n - 1){
-				if(max_sol > (*n_sol)){
-					printf("Solution :: %d\n", *n_sol + 1);
-					printCheckBoard(x, n);
-					(*n_sol)++;
-					return 1;
-				}
+				printCheckBoard(x, n);
+				(*n_sol)++;
+				return;
 			}
-			recursive_nqueen(x, i + 1, n, n_sol, max_sol);
+			else 
+				recursive_nqueen(x, i + 1, n, n_sol, max_sol);
 		}
 	}
-	return *n_sol;
+	return;
 }
 
 int iterative_nqueen(int *x, int n, int max_sol){
@@ -74,13 +85,17 @@ int iterative_nqueen(int *x, int n, int max_sol){
 	}
 	return n_sol;
 }
+
 int getMaxSolutions(){
 	int x;
 	printf("Enter Max number of solutions :: ");
 	scanf("%d", &x);
+	if(x < 0)
+		x = INT_MAX;
 	printf("\n");
 	return x;
 }
+
 int main(int argc, char const *argv[])
 {
 	int choice, n;
@@ -90,8 +105,10 @@ int main(int argc, char const *argv[])
 		scanf("%d", &choice);
 		switch(choice){
 			case 1: {
-				printf("Enter the number of queens :: ");
-				scanf("%d", &n);
+				do{
+					printf("Enter the number of queens (Should be strictly greater than 3):: ");
+					scanf("%d", &n);
+				}while(n < 4);
 				int *x = (int *)malloc(n*sizeof(int)); 
 				int max_sol, n_sol;
 
@@ -102,12 +119,19 @@ int main(int argc, char const *argv[])
 				break;
 			}
 			case 2: {
-				printf("Enter the number of queens :: ");
-				scanf("%d", &n);
+				do{
+					printf("Enter the number of queens (Should be strictly greater than 3):: ");
+					scanf("%d", &n);
+				}while(n < 4);
 				int *x = (int *)malloc(n*sizeof(int)); 
 				int max_sol, n_sol = 0;
 
 				max_sol = getMaxSolutions();
+				if(n == 1){
+					x[0] = 0;
+					printCheckBoard(x, 1);
+					break;
+				}
 				recursive_nqueen(x, 0, n, &n_sol, max_sol);
 				printf("Number of solutions :: %d\n", n_sol);
 				free(x);

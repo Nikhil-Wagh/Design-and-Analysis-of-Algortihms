@@ -6,6 +6,15 @@ typedef struct edge{
 	int src, dest, wgt;
 }edge;
 
+int alreadyPresent(edge* edges, int x, int y, int n){
+	// printf("%d\n", e);
+	for(size_t i = 0 ; i < n ; i++){
+		if((x - 1) == edges[i].src && (y - 1) == edges[i].dest)
+			return 1;
+	}
+	return 0;
+}
+
 int main(int argc, char const *argv[]) {
 	int e, v, src;
 	printf("Enter number of vertices :: ");
@@ -27,10 +36,19 @@ int main(int argc, char const *argv[]) {
 		int x, y;
 		do{
 			scanf("%d %d %d", &x, &y, &edges[i].wgt);
-			if((x != y) && ((x >= 0 && x <= v) && (y >= 0 && y <= v))){
+			if(x == y){
+				printf("Self loop\n");
+			}
+			else if(!((x > 0 && x <= v) && (y > 0 && y <= v))){
+				printf("Vertex out of range\n");
+			}
+			else if (alreadyPresent(edges, x, y, i)){
+				printf("Edge already present\n");
+			}
+			else{
 				break;
 			}
-			printf("Incorrect data. Enter again\n");
+			printf("Enter again\n\n");
 		}while(1);
 		edges[i].src = x - 1;
 		edges[i].dest = y - 1;
