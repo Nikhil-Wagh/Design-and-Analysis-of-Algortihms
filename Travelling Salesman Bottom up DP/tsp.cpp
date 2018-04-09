@@ -11,18 +11,12 @@ std::vector<int> citiesNotInSet(std::vector<int> _set, int n){
 			v.push_back(i);
 		}
 	}
-	// cout << "OLD : ";
-	// for(int i = 0 ; i < _set.size() ; i++)
-	// 	cout << _set[i] << " ";
-	// cout << endl;
-	// cout << "NEW : "; 
-	// for(int i = 0 ; i < v.size() ; i++)
-	// 	cout << v[i] << " ";
-	// cout << endl << endl;
 	return v;
 }
 
+
 int main(){
+	// cout << "Traveling Salesman Problem" << endl;
 	int n_cities;
 	cout << "Enter number of cities :: ";
 	cin >> n_cities;
@@ -52,16 +46,48 @@ int main(){
 	// 	cout << endl;
 	// }
 
+	int e;
+	while(true){
+		cout << "Enter the number of edges :: ";
+		cin >> e; 
+		if(e > 0)
+			break;
+		cout << "Incorrect Input" << endl;
+	}
 
-	cout << "Enter adjacency matrix" << endl;
-	int adj[n_cities][n_cities];
+	cout << "Enter the edges with thier weights. ( should be > 0)" << endl;
+	int adj[n_cities + 1][n_cities + 1];
 	for(int i = 0 ; i < n_cities ; i++){
-		for(int j = 0 ; j < n_cities ; j++){
-			cin >> adj[i][j];
+		for(int j = 0 ; j < n_cities ; j++)
+			adj[i][j] = INT_MAX;
+	}
+	//input
+	for(int i = 0 ; i < e ; i++){
+		int x, y, z;
+		cin >> x >> y >> z;
+		x--;y--;
+
+		if(adj[x][y] != INT_MAX){
+			cout << "Edge already present." << endl; i--; 
+		}
+		else if (x == y){
+			cout << "Cannot contain self loop" << endl; i--;
+		}
+		else if((x < 0) || (x > n_cities) || (y < 0) || (y > n_cities)){
+			cout << "Incorrect vertices" << endl; i--; 
+		}
+		else if (z <= 0){
+			cout << "Weight Incorrect" << endl; i--; 
+		}
+		else
+		{
+			adj[x][y] = z;
 		}
 	}
 
-	int start = 0;
+	cout << endl;
+
+	int start = 0, si = -1;
 	map< pair < vector<int> , int>, pair <int, int> > calculatedCost;
 
 	for(int i = 0 ; i < sets.size() ; i++){
@@ -69,11 +95,25 @@ int main(){
 		_cities = citiesNotInSet(sets[i], n_cities);
 		
 		if(!(_cities.size()))
-			_cities.push_back(0);
+			_cities.push_back(start);
+
+		if(sets[i].size()!=si){
+			si=sets[i].size();
+			cout << endl << "|S| :: " << sets[i].size() << endl;
+		}
 
 		for(int j = 0 ; j < _cities.size() ; j++){
 			if(!(sets[i].size())){
-				calculatedCost[make_pair(sets[i], _cities[j])] = make_pair(adj[start][_cities[j]], start);
+				cout << "Cost [" << _cities[j] + 1 << ", { } ] = ";
+				if(adj[_cities[j]][start] != INT_MAX){
+					pair <vector <int>, int > v;
+					v = make_pair(sets[i], _cities[j]);
+					calculatedCost[v] = make_pair(adj[_cities[j]][start], start);
+					cout << calculatedCost[v].first << ", Parent :: " << start + 1 << endl;
+				}
+				else{
+					cout << "No Path, Parent :: -1" << endl;
+				}
 			}
 			else{
 				int min_cost = INT_MAX, parent = -1;
@@ -91,44 +131,53 @@ int main(){
 					pair < vector<int>, int > temp;
 					temp = make_pair(v, sets[i][k]);
 
-					int current_cost = calculatedCost[temp].first + adj[sets[i][k]][_cities[j]];
-					if(min_cost > current_cost){
-						min_cost = current_cost;
-						parent = sets[i][k];
+					if(adj[_cities[j]][sets[i][k]] != INT_MAX && calculatedCost.count(temp)){
+						int current_cost = calculatedCost[temp].first + adj[_cities[j]][sets[i][k]];
+						if(min_cost > current_cost){
+							min_cost = current_cost;
+							parent = sets[i][k];
+						}
 					}
 				}
-				cout << "Cost [" << _cities[j] << ", { ";
+				cout << "Cost [" << _cities[j] + 1 << ", { ";
 				for(int k = 0 ; k < sets[i].size() ; k++){
-					cout << sets[i][k] << " ";
+					cout << sets[i][k] + 1 << " ";
 				}
-				cout << "}] = " << min_cost << ", Parent :: " << calculatedCost[make_pair(sets[i], _cities[j])].second << endl;
-
-				calculatedCost[make_pair(sets[i], _cities[j])] = make_pair(min_cost, parent);
+				cout << "}] = ";
+				if(min_cost != INT_MAX){
+					pair <vector<int>, int > v;
+					v = make_pair(sets[i], _cities[j]);
+					calculatedCost[v] = make_pair(min_cost, parent);
+					cout << calculatedCost[v].first << ", Parent :: " << calculatedCost[v].second + 1 << endl;	
+				}
+				else{
+					cout << "No Path, Parent :: -1" << endl;
+				}
 			}
 		}
 	}
-
+	cout << endl;
 
 	std::vector<int> v;
 	v = citiesNotInSet(v, n_cities);
 
-	int parent = calculatedCost[make_pair(v, 0)].second;
-	// cout << calculatedCost[make_pair(v, 0)].first << " " << parent << endl;
-
-	stack <int> s;
-	for(int i = 0 ; i < n_cities ; i++){
-		s.push(parent);
-		//cout << parent << " ";
-		if(find(v.begin(), v.end(), parent) != v.end())
-			v.erase(find(v.begin(), v.end(), parent));
-		parent = calculatedCost[make_pair(v, parent)].second;
+	if(calculatedCost.count(make_pair(v, start))){
+		int parent = calculatedCost[make_pair(v, start)].second;
+		cout << "MIN COST :: " << calculatedCost[make_pair(v, start)].first << endl;
+		cout << start + 1;
+		while(true){
+			cout << " -> " << parent + 1;
+			if(v.size())
+				v.erase(find(v.begin(), v.end(), parent));
+			if(parent == start)
+				break;
+			parent = calculatedCost[make_pair(v, parent)].second;
+		}
+		cout << endl;
 	}
-
-	while(!s.empty()){
-		cout << s.top() << " -> ";
-		s.pop();  
+	else{
+		cout << "No Path Possible" << endl;
 	}
-	cout << 0 << endl;
 	return 0;
 }		
 
@@ -141,5 +190,23 @@ int main(){
 2 0 7 3
 9 6 0 12
 10 4 8 0
+
+
+4
+12
+1 2 1
+1 3 15
+1 4 6
+2 1 2
+2 3 7
+2 4 3
+3 1 9
+3 2 6
+3 4 12
+4 1 10 
+4 2 4
+4 3 8
+
+1 2 4 3 1
 
 */

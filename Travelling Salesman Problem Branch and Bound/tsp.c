@@ -4,14 +4,14 @@
 #define INT_MAX 2147483647
 #endif
 
-typedef struct node{
+typedef struct data{
 	int cost, cityno, levelno, nodeno;
 	int *RCM;
 	struct node *parent;
 }node;
 
 typedef struct list{
-	node *data;
+	data *d;
 	struct list *next;
 }list;
 
@@ -72,25 +72,7 @@ int reduceCost(int *a, int n){
 	return cost;
 }
 
-void enque(list *l, node *d){
-	if(l == NULL){
-		l -> next = NULL;
-		l -> data = d;
-		return;
-	}
-	//node *temp_node = (node *)malloc(sizeof(node));
-	list *temp_list = l;
-	temp_node = l -> data;
-	while(temp_list -> next != NULL && temp_list -> next -> data -> cost < d -> cost){
-		temp_list = temp_list -> next;
-		// temp_node = temp_list -> data;
-	}
-	list *temp = temp_list -> next;
-	list 
-	temp_list -> next = 
-
-
-}
+void enque()
 
 void tsp(node *root, int * adj, int n_cities){
 

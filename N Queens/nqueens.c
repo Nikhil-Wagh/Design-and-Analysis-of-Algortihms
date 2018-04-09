@@ -37,8 +37,7 @@ void recursive_nqueen(int *x, int i, int n, int *n_sol, int max_sol){
 	// 	return 0;
 	if(i >= n)
 		return;
-	int f = 0;
-	for(int k = 0 ; k < n && (!f); k++){
+	for(int k = 0 ; k < n ; k++){
 		if(*n_sol >= max_sol)
 			return;
 		x[i] = k;
