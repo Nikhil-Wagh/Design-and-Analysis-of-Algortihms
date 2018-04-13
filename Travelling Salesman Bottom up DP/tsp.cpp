@@ -111,9 +111,6 @@ int main(){
 					calculatedCost[v] = make_pair(adj[_cities[j]][start], start);
 					cout << calculatedCost[v].first << ", Parent :: " << start + 1 << endl;
 				}
-				else{
-					cout << "No Path, Parent :: -1" << endl;
-				}
 			}
 			else{
 				int min_cost = INT_MAX, parent = -1;
@@ -149,9 +146,6 @@ int main(){
 					v = make_pair(sets[i], _cities[j]);
 					calculatedCost[v] = make_pair(min_cost, parent);
 					cout << calculatedCost[v].first << ", Parent :: " << calculatedCost[v].second + 1 << endl;	
-				}
-				else{
-					cout << "No Path, Parent :: -1" << endl;
 				}
 			}
 		}
